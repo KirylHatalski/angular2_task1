@@ -48,7 +48,6 @@
 	__webpack_require__(1);
 	var load_google_maps_api_1 = __webpack_require__(2);
 	var geoLat, geoLng, map, weather;
-	//
 	navigator.geolocation.getCurrentPosition(function (position) {
 	    geoLat = position.coords.latitude;
 	    geoLng = position.coords.longitude;
@@ -64,7 +63,8 @@
 	        var xhr = new XMLHttpRequest();
 	        if (localStorage.getItem('weather')) {
 	            weather = JSON.parse(localStorage.getItem('weather'));
-	            resolve(weather);
+	            if (Date.now() - weather.createTime < 10 * 60 * 1000)
+	                resolve(weather);
 	        }
 	        if (!weather || (Date.now() - weather.createTime > 10 * 60 * 1000)) {
 	            xhr.open('GET', "http://api.openweathermap.org/data/2.5/find?lat=" + geoLat + "&lon=" + geoLng + "&cnt=50&&APPID=1c7ecf45bce8b3c0fe6043ec72db7c26", true);
@@ -76,15 +76,11 @@
 	                    localStorage.setItem('weather', JSON.stringify(weather));
 	                    resolve(weather);
 	                }
-	                else {
-	                    reject(Error('There was a network error.'));
-	                }
 	            };
 	        }
 	    });
 	}
 	function CreateMark(data) {
-	    console.log(data);
 	    data.list.forEach(function (variable) {
 	        new google.maps.Marker({
 	            position: { lat: +variable.coord.lat, lng: +variable.coord.lon },
