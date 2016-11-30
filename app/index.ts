@@ -1,13 +1,13 @@
 import './styles.styl'
-import loadGoogleMapsAPI from 'load-google-maps-api';
+import './interfaces.ts'
 
 let geoLat: number,
     geoLng: number,
-    map: Object,
-    weather: Object;
+    map: google.maps.Map,
+    weather: IWeather;
 
 navigator.geolocation.getCurrentPosition(
-    function(position: any) {
+    function(position: IPositionNavigator) {
         geoLat = position.coords.latitude;
         geoLng = position.coords.longitude;
 
@@ -21,9 +21,9 @@ navigator.geolocation.getCurrentPosition(
         initMap();
     });
 
-function initWeather() {
-    return new Promise((resolve, reject) => {
-        var xhr = new XMLHttpRequest();
+function initWeather(): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+        let xhr = new XMLHttpRequest();
 
         if (localStorage.getItem('weather')) {
             weather = JSON.parse(localStorage.getItem('weather'));
@@ -46,8 +46,8 @@ function initWeather() {
     });
 }
 
-function CreateMark(data) {
-    data.list.forEach(variable => {
+function CreateMark(data: IMarkData) {
+    data.list.forEach((variable: IDataListItem) => {
         new google.maps.Marker({
             position: { lat: +variable.coord.lat, lng: +variable.coord.lon },
             map: map,
@@ -66,17 +66,20 @@ function CreateMark(data) {
 }
 
 function initMap() {
-    loadGoogleMapsAPI(['AIzaSyA2BbPGgt4MP4YD12z5AftgBgGS9vitNJE']).then((googleMaps: any) => {
-        map = new googleMaps.Map(document.querySelector('.map'), {
-            center: { lat: geoLat, lng: geoLng },
-            zoom: 10,
-            mapTypeId: googleMaps.MapTypeId.SATELLITE
-        });
+    let elem = document.createElement('script');
+        (<IWindow>window).googleResponse = () => {
+          map = new google.maps.Map(document.querySelector('.map'), {
+              center: { lat: geoLat, lng: geoLng },
+              zoom: 10,
+              mapTypeId: google.maps.MapTypeId.SATELLITE
+          });
 
-        initWeather().then((data) => CreateMark.call(this, data));
-    }).catch((err: any) => {
-        console.log(err)
-    });
+          initWeather().then((data: Object) => CreateMark.call(this, data));
+        }
+
+        elem.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA2BbPGgt4MP4YD12z5AftgBgGS9vitNJE&callback=googleResponse`
+
+        document.body.appendChild(elem);
 }
 
 function getRandom(range: number) {

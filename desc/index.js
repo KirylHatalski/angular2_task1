@@ -46,7 +46,7 @@
 
 	"use strict";
 	__webpack_require__(1);
-	var load_google_maps_api_1 = __webpack_require__(2);
+	__webpack_require__(2);
 	var geoLat, geoLng, map, weather;
 	navigator.geolocation.getCurrentPosition(function (position) {
 	    geoLat = position.coords.latitude;
@@ -100,16 +100,17 @@
 	}
 	function initMap() {
 	    var _this = this;
-	    load_google_maps_api_1.default(['AIzaSyA2BbPGgt4MP4YD12z5AftgBgGS9vitNJE']).then(function (googleMaps) {
-	        map = new googleMaps.Map(document.querySelector('.map'), {
+	    var elem = document.createElement('script');
+	    window.googleResponse = function () {
+	        map = new google.maps.Map(document.querySelector('.map'), {
 	            center: { lat: geoLat, lng: geoLng },
 	            zoom: 10,
-	            mapTypeId: googleMaps.MapTypeId.SATELLITE
+	            mapTypeId: google.maps.MapTypeId.SATELLITE
 	        });
 	        initWeather().then(function (data) { return CreateMark.call(_this, data); });
-	    }).catch(function (err) {
-	        console.log(err);
-	    });
+	    };
+	    elem.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyA2BbPGgt4MP4YD12z5AftgBgGS9vitNJE&callback=googleResponse";
+	    document.body.appendChild(elem);
 	}
 	function getRandom(range) {
 	    return (Math.random() * range) - (range / 2);
@@ -126,66 +127,7 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	exports.default = function () {
-	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-	  var client = _ref.client;
-	  var key = _ref.key;
-	  var language = _ref.language;
-	  var _ref$libraries = _ref.libraries;
-	  var libraries = _ref$libraries === undefined ? [] : _ref$libraries;
-	  var _ref$timeout = _ref.timeout;
-	  var timeout = _ref$timeout === undefined ? 10000 : _ref$timeout;
-	  var v = _ref.v;
-
-	  var callbackName = '__googleMapsApiOnLoadCallback';
-
-	  return new Promise(function (resolve, reject) {
-
-	    // Exit if not running inside a browser.
-	    if (typeof window === 'undefined') {
-	      return reject(new Error('Can only load the Google Maps API in the browser'));
-	    }
-
-	    // Prepare the `script` tag to be inserted into the page.
-	    var scriptElement = document.createElement('script');
-	    var params = ['callback=' + callbackName];
-	    if (client) params.push('client=' + client);
-	    if (key) params.push('key=' + key);
-	    if (language) params.push('language=' + language);
-	    libraries = [].concat(libraries); // Ensure that `libraries` is an array
-	    if (libraries.length) params.push('libraries=' + libraries.join(','));
-	    if (v) params.push('v=' + v);
-	    scriptElement.src = 'https://maps.googleapis.com/maps/api/js?' + params.join('&');
-
-	    // Timeout if necessary.
-	    var timeoutId = null;
-	    if (timeout) {
-	      timeoutId = setTimeout(function () {
-	        window[callbackName] = function () {}; // Set the on load callback to a no-op.
-	        reject(new Error('Could not load the Google Maps API'));
-	      }, timeout);
-	    }
-
-	    // Hook up the on load callback.
-	    window[callbackName] = function () {
-	      if (timeoutId !== null) {
-	        clearTimeout(timeoutId);
-	      }
-	      resolve(window.google.maps);
-	      delete window[callbackName];
-	    };
-
-	    // Insert the `script` tag.
-	    document.body.appendChild(scriptElement);
-	  });
-	};
+	
 
 /***/ }
 /******/ ]);

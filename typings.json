@@ -1,0 +1,8 @@
+{
+  "name": "a2mp01",
+  "globalDependencies": {
+    "googlemaps": "github:DefinitelyTyped/DefinitelyTyped/googlemaps/google.maps.d.ts#6ce02d59a497f76473df750dbfbdcb0984a25adb",
+    "google-maps": "github:DefinitelyTyped/DefinitelyTyped/google-maps/google-maps.d.ts#c21a2d49821b1a7d882b85e72255cdcf1532d1a3",
+    "es6-promise": "github:DefinitelyTyped/DefinitelyTyped/es6-promise/es6-promise.d.ts#35989a3ab4834b8e8b2b56788f1d4fc46a25dc8d"
+  }
+}
